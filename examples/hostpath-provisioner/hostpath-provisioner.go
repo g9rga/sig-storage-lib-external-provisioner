@@ -19,8 +19,10 @@ package main
 import (
 	"errors"
 	"flag"
+	"github.com/golang/glog"
 	"os"
 	"path"
+	"strings"
 	"syscall"
 
 	"sigs.k8s.io/sig-storage-lib-external-provisioner/v5/controller"
@@ -34,7 +36,7 @@ import (
 )
 
 const (
-	provisionerName = "example.com/hostpath"
+	provisionerName = "k8s.io/minikube-hostpath"
 )
 
 type hostPathProvisioner struct {
@@ -52,8 +54,13 @@ func NewHostPathProvisioner() controller.Provisioner {
 	if nodeName == "" {
 		klog.Fatal("env variable NODE_NAME must be set so that this provisioner can identify itself")
 	}
+	pvBasePath := os.Getenv("PV_BASEPATH")
+	if pvBasePath == "" {
+		klog.Fatal("PV_BASEPATH required for pv provision")
+	}
+
 	return &hostPathProvisioner{
-		pvDir:    "/tmp/hostpath-provisioner",
+		pvDir:    strings.TrimSuffix(pvBasePath, "/"),
 		identity: nodeName,
 	}
 }
@@ -138,6 +145,8 @@ func main() {
 	// Create the provisioner: it implements the Provisioner interface expected by
 	// the controller
 	hostPathProvisioner := NewHostPathProvisioner()
+
+	glog.Infof("Starting provisioner: " + provisionerName)
 
 	// Start the provision controller which will dynamically provision hostPath
 	// PVs

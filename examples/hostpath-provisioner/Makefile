@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE?=hostpath-provisioner
+IMAGE?=9rga/k8s-hostpath-provisioner:latest
 
 all: dep hostpath-provisioner image
 

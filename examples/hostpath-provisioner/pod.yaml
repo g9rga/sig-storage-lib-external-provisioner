@@ -5,18 +5,13 @@ metadata:
 spec:
   containers:
     - name: hostpath-provisioner
-      image: hostpath-provisioner:latest
-      imagePullPolicy: "IfNotPresent"
+      image: 9rga/k8s-hostpath-provisioner:latest
+      imagePullPolicy: "Always"
       env:
+        - name: PV_BASEPATH
+          value: "/home/eth/www/pv"
         - name: NODE_NAME
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-      volumeMounts:
-        - name: pv-volume
-          mountPath: /tmp/hostpath-provisioner
-  serviceAccountName: hostpath-provisioner
-  volumes:
-    - name: pv-volume
-      hostPath:
-        path: /tmp/hostpath-provisioner
+  serviceAccountName: 9rga-hostpath-provisioner
